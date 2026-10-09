@@ -5,15 +5,17 @@ topology:
     r1:
       kind: linux
       image: quay.io/frrouting/frr:9.1.0
-      exec:
-        - ip addr add 10.1.1.1/24 dev eth1
-        - ip addr add 10.0.12.1/30 dev eth2
+      binds:
+        - configs/r1/daemons:/etc/frr/daemons
+        - configs/r1/frr.conf:/etc/frr/frr.conf
+        - configs/r1/vtysh.conf:/etc/frr/vtysh.conf
     r2:
       kind: linux
       image: quay.io/frrouting/frr:9.1.0
-      exec:
-        - ip addr add 10.0.12.2/30 dev eth1
-        - ip addr add 10.2.2.1/24 dev eth2
+      binds:
+        - configs/r2/daemons:/etc/frr/daemons
+        - configs/r2/frr.conf:/etc/frr/frr.conf
+        - configs/r2/vtysh.conf:/etc/frr/vtysh.conf
     host1:
       kind: linux
       image: wbitt/network-multitool:alpine-minimal
