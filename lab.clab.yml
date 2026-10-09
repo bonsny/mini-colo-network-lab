@@ -1,0 +1,33 @@
+name: mini-colo
+
+topology:
+  nodes:
+    r1:
+      kind: linux
+      image: quay.io/frrouting/frr:9.1.0
+      exec:
+        - ip addr add 10.1.1.1/24 dev eth1
+        - ip addr add 10.0.12.1/30 dev eth2
+    r2:
+      kind: linux
+      image: quay.io/frrouting/frr:9.1.0
+      exec:
+        - ip addr add 10.0.12.2/30 dev eth1
+        - ip addr add 10.2.2.1/24 dev eth2
+    host1:
+      kind: linux
+      image: wbitt/network-multitool:alpine-minimal
+      exec:
+        - ip addr add 10.1.1.10/24 dev eth1
+        - ip route add 10.0.0.0/8 via 10.1.1.1
+    host2:
+      kind: linux
+      image: wbitt/network-multitool:alpine-minimal
+      exec:
+        - ip addr add 10.2.2.10/24 dev eth1
+        - ip route add 10.0.0.0/8 via 10.2.2.1
+
+  links:
+    - endpoints: ["host1:eth1", "r1:eth1"]
+    - endpoints: ["r1:eth2", "r2:eth1"]
+    - endpoints: ["r2:eth2", "host2:eth1"]
