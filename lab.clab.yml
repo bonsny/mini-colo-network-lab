@@ -23,21 +23,37 @@ topology:
         - configs/r3/daemons:/etc/frr/daemons
         - configs/r3/frr.conf:/etc/frr/frr.conf
         - configs/r3/vtysh.conf:/etc/frr/vtysh.conf
+    isp:
+      kind: linux
+      image: quay.io/frrouting/frr:9.1.0
+      binds:
+        - configs/isp/daemons:/etc/frr/daemons
+        - configs/isp/frr.conf:/etc/frr/frr.conf
+        - configs/isp/vtysh.conf:/etc/frr/vtysh.conf
+    exch:
+      kind: linux
+      image: quay.io/frrouting/frr:9.1.0
+      binds:
+        - configs/exch/daemons:/etc/frr/daemons
+        - configs/exch/frr.conf:/etc/frr/frr.conf
+        - configs/exch/vtysh.conf:/etc/frr/vtysh.conf
     host1:
       kind: linux
       image: wbitt/network-multitool:alpine-minimal
       exec:
         - ip addr add 10.1.1.10/24 dev eth1
-        - ip route add 10.0.0.0/8 via 10.1.1.1
+        - ip route replace default via 10.1.1.1
     host2:
       kind: linux
       image: wbitt/network-multitool:alpine-minimal
       exec:
         - ip addr add 10.2.2.10/24 dev eth1
-        - ip route add 10.0.0.0/8 via 10.2.2.1
+        - ip route replace default via 10.2.2.1
 
   links:
     - endpoints: ["host1:eth1", "r1:eth1"]
     - endpoints: ["r1:eth2", "r2:eth1"]
     - endpoints: ["r2:eth2", "host2:eth1"]
     - endpoints: ["r2:eth3", "r3:eth1"]
+    - endpoints: ["r1:eth3", "isp:eth1"]
+    - endpoints: ["r3:eth2", "exch:eth1"]
